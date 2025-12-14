@@ -189,10 +189,10 @@ git commit -m "feat: implement [task description]
 ## Current Status
 
 ### Active Work Item
-- **Work Item File**: [changes/001-capacity-monitoring.md](../changes/001-capacity-monitoring.md)
-- **Current Task**: Task 2: Throughput Capacity Monitoring
-- **Current Stage**: PLAN ❌ Not Started
-- **Last Updated**: 2025-09-18
+- **Work Item File**: [changes/001-create application listing feature.md](../changes/001-create%20application%20listing%20feature.md)
+- **Current Task**: Task 2: Frontend - Application List Display
+- **Current Stage**: BUILD & ASSESS
+- **Last Updated**: 2025-12-14
 
 ### When Active
 When working on a story, this section will show:

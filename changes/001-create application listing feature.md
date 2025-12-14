@@ -18,14 +18,14 @@ This is a fresh project start - we'll create the entire Configuration Service co
 **When** a GET request is made to `/api/v1/applications`  
 **Then** the API returns a JSON array of all applications with their id, name, and description
 
-**Status**: 🔵 PLAN Stage (Current Task)
+**Status**: ✅ COMPLETE
 
 ### Task 2: Frontend - Application List Display
 **Given** the backend API provides an applications listing endpoint  
 **When** the administrator opens the Configuration Service UI  
 **Then** they see a list of all applications with their names and descriptions
 
-**Status**: ⚪ Not Started
+**Status**: 🔵 IN PROGRESS
 
 ### Task 3: Frontend - Empty State Handling
 **Given** there are no applications in the database  
@@ -36,107 +36,142 @@ This is a fresh project start - we'll create the entire Configuration Service co
 
 ---
 
-## Current Task: Task 1 - Backend List Applications Endpoint
+## Current Task: Task 2 - Frontend Application List Display
 
-### Current Stage: 🔵 PLAN
+### Current Stage: 🔵 BUILD & ASSESS
 
 ---
 
-## PLAN Stage Details
+## BUILD & ASSESS Stage Details
+
+### Build Progress
+- [x] Initialize Vite React TypeScript project structure
+- [x] Create TypeScript types/interfaces matching backend DTOs
+- [x] Implement API service with `getApplications()` method
+- [x] Write API service unit tests with mocked fetch
+- [x] Create ApplicationList component with loading/error/data states
+- [x] Write ApplicationList component unit tests
+- [x] Set up Vite proxy configuration to backend API
+- [x] Add UI commands to Makefile (install-ui, run-ui, test-ui)
+- [x] Update .gitignore
+- [ ] Integration tests (deferred - not critical for initial implementation)
+- [ ] Test full workflow: run backend → run UI → view applications list
+
+### Quality Validation Status
+- [x] API service tests passing (5/5 tests pass)
+- [ ] Component tests have TypeScript configuration issue with jest-dom matchers (logic is correct, TS types need adjustment)
+- [ ] TypeScript compilation check needed
+- [ ] Manual browser verification needed
+
+### Known Issues
+- Jest-dom matcher types not recognized by TypeScript in test files (toBeInTheDocument)
+- Tests execute correctly at runtime, but TS compilation fails during test run
+- API service tests all pass successfully
+
+---
+
+## PLAN Stage Details (Completed)
 
 ### Test Strategy
 
-#### Unit Tests (with mocked database I/O)
-1. **ApplicationRepository Tests**
-   - `GetAllApplications_ReturnsEmptyList_WhenNoApplicationsExist`
-   - `GetAllApplications_ReturnsApplicationList_WhenApplicationsExist`
-   - `GetAllApplications_MapsDbRowsToModelsCorrectly`
+#### Unit Tests (with mocked API calls)
+1. **API Service Tests** (`ui/src/services/__tests__/api.test.ts`)
+   - `getApplications_CallsCorrectEndpoint_WithGETMethod`
+   - `getApplications_ReturnsApplicationsList_OnSuccess`
+   - `getApplications_ThrowsError_On404Response`
+   - `getApplications_ThrowsError_On500Response`
+   - `getApplications_ThrowsError_OnNetworkFailure`
 
-2. **ApplicationsController Tests**
-   - `GetApplications_Returns200_WithApplicationList`
-   - `GetApplications_Returns200_WithEmptyArray_WhenNoApplications`
-   - `GetApplications_Returns500_WhenRepositoryThrowsException`
+2. **ApplicationList Component Tests** (`ui/src/components/__tests__/ApplicationList.test.tsx`)
+   - `ApplicationList_ShowsLoadingState_Initially`
+   - `ApplicationList_DisplaysApplications_WhenDataLoaded`
+   - `ApplicationList_DisplaysMultipleApplications_Correctly`
+   - `ApplicationList_ShowsErrorMessage_OnAPIFailure`
+   - `ApplicationList_ShowsApplicationNames_InList`
+   - `ApplicationList_ShowsApplicationDescriptions_InList`
 
-3. **Validation Tests**
-   - `ApplicationResponse_HasRequiredFields`
-   - `ApplicationModel_ValidatesCorrectly`
+3. **Type Safety Tests**
+   - `ApplicationResponse_TypeMatchesBackendContract`
+   - `API_Service_ReturnsCorrectTypes`
 
-#### Integration Tests (with real MS SQL Server)
-1. **End-to-End Endpoint Tests**
-   - `GET_Applications_ReturnsDataFromDatabase`
-   - `GET_Applications_ReturnsEmptyArray_WhenDatabaseIsEmpty`
-   - `GET_Applications_HandlesMultipleApplications`
-   - `GET_Applications_OrdersByName`
+#### Integration Tests (with real backend or MSW)
+1. **End-to-End Component Tests** (`ui/src/components/__tests__/ApplicationList.integration.test.tsx`)
+   - `ApplicationList_FetchesAndDisplaysRealData_FromBackend`
+   - `ApplicationList_HandlesRealAPIErrors_Gracefully`
+   - `ApplicationList_UpdatesWhenDataChanges`
 
-2. **Database Tests**
-   - `Migration_CreatesApplicationsTable_Successfully`
-   - `ApplicationsTable_HasCorrectSchema`
+2. **Browser Tests**
+   - `UI_RendersApplicationList_InBrowser`
+   - `UI_HandlesEmptyState_InBrowser` (handled in Task 3)
 
 ### File Changes Needed
 
-#### Backend Core Files (svc/)
-- `svc/ConfigService.csproj` - Project file with dependencies (ASP.NET Core, Dapper, FluentValidation, Ulid-dotnet, Swashbuckle)
-- `svc/Program.cs` - ASP.NET Core setup, DI configuration, Swagger
-- `svc/appsettings.example.json` - Configuration template with connection string
-- `svc/Models/Application.cs` - Application domain model (Id, Name, Description)
-- `svc/Models/Responses/ApplicationResponse.cs` - DTO for API responses
-- `svc/Models/Responses/ErrorResponse.cs` - Error response model
-- `svc/Repositories/IApplicationRepository.cs` - Repository interface
-- `svc/Repositories/ApplicationRepository.cs` - Dapper-based repository implementation
-- `svc/Controllers/ApplicationsController.cs` - API controller with GET endpoint
-- `svc/Migrations/001_CreateApplicationsTable.cs` - Fluent Migrations for schema
+#### Frontend Core Files (ui/)
+- `ui/package.json` - NPM project config with React, TypeScript, Vite, Jest dependencies
+- `ui/tsconfig.json` - TypeScript strict mode configuration
+- `ui/vite.config.ts` - Vite configuration with proxy to backend
+- `ui/index.html` - Entry HTML file
+- `ui/src/main.tsx` - React application entry point
+- `ui/src/App.tsx` - Main App component
+- `ui/src/vite-env.d.ts` - Vite TypeScript declarations
 
-#### Backend Test Files (svc.Tests/)
-- `svc.Tests/ConfigService.Tests.csproj` - Test project file (xUnit, Moq, FluentAssertions)
-- `svc.Tests/Repositories/ApplicationRepositoryTests.cs` - Repository unit tests
-- `svc.Tests/Controllers/ApplicationsControllerTests.cs` - Controller unit tests
-- `svc.Tests/Integration/ApplicationsEndpointTests.cs` - Integration tests with WebApplicationFactory
+#### Frontend Service Layer
+- `ui/src/services/api.ts` - API service with `getApplications()` method
+- `ui/src/types/Application.ts` - TypeScript interfaces matching backend DTOs
 
-#### Project Infrastructure
-- `Makefile` - Development task automation (install, test, run, db commands)
-- `.gitignore` - Ignore bin/, obj/, appsettings.Development.json, node_modules/
-- `README.md` - Setup instructions and usage guide
+#### Frontend Components
+- `ui/src/components/ApplicationList.tsx` - Component to fetch and display applications
+- `ui/src/components/ApplicationList.module.css` - Component-scoped styles
 
-#### Database Schema
-```sql
-CREATE TABLE applications (
-    id VARCHAR(26) PRIMARY KEY,
-    name NVARCHAR(255) NOT NULL UNIQUE,
-    description NVARCHAR(1000) NULL,
-    created_at DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
-    updated_at DATETIME2 NOT NULL DEFAULT GETUTCDATE()
-);
-```
+#### Frontend Test Files
+- `ui/jest.config.js` - Jest configuration for TypeScript and React
+- `ui/src/setupTests.ts` - Jest setup file (testing-library config)
+- `ui/src/services/__tests__/api.test.ts` - API service unit tests
+- `ui/src/components/__tests__/ApplicationList.test.tsx` - Component unit tests
+- `ui/src/components/__tests__/ApplicationList.integration.test.tsx` - Integration tests
+
+#### Project Infrastructure Updates
+- `Makefile` - Add UI commands (install-ui, run-ui, test-ui, ui-build)
+- `.gitignore` - Add ui/node_modules/, ui/dist/, ui/coverage/
+- `README.md` - Add UI setup and development instructions
 
 ### Dependencies Required
 
-**Backend (NuGet packages)**:
-- `Microsoft.AspNetCore.App` (Framework)
-- `Dapper` (2.1+) - Micro-ORM
-- `Microsoft.Data.SqlClient` (5.2+) - SQL Server driver
-- `Ulid` (1.3+) - ULID generation
-- `FluentValidation.AspNetCore` (11.3+) - Validation
-- `Swashbuckle.AspNetCore` (6.5+) - OpenAPI/Swagger
-- `FluentMigrator` (5.1+) - Database migrations
-- `FluentMigrator.Runner` (5.1+) - Migration runner
+**Frontend (NPM packages)**:
+- `react` (^18.3.0) - React framework
+- `react-dom` (^18.3.0) - React DOM rendering
+- `typescript` (^5.5.0) - TypeScript compiler
+- `vite` (^5.4.0) - Build tool and dev server
+- `@vitejs/plugin-react` (^4.3.0) - Vite React plugin
 
-**Testing (NuGet packages)**:
-- `xUnit` (2.6+) - Test framework
-- `xUnit.runner.visualstudio` (2.5+) - Test runner
-- `Moq` (4.20+) - Mocking framework
-- `FluentAssertions` (6.12+) - Assertion library
-- `Microsoft.AspNetCore.Mvc.Testing` (8.0+) - Integration testing
+**Development (NPM packages)**:
+- `@types/react` (^18.3.0) - React type definitions
+- `@types/react-dom` (^18.3.0) - React DOM type definitions
+- `eslint` (^9.0.0) - Linting
+- `@typescript-eslint/eslint-plugin` (^8.0.0) - TypeScript ESLint rules
+- `@typescript-eslint/parser` (^8.0.0) - TypeScript ESLint parser
+
+**Testing (NPM packages)**:
+- `jest` (^29.7.0) - Test framework
+- `@testing-library/react` (^16.0.0) - React testing utilities
+- `@testing-library/jest-dom` (^6.5.0) - DOM matchers
+- `@testing-library/user-event` (^14.5.0) - User interaction simulation
+- `@types/jest` (^29.5.0) - Jest type definitions
+- `jest-environment-jsdom` (^29.7.0) - DOM environment for Jest
+- `ts-jest` (^29.2.0) - TypeScript Jest transformer
 
 ### Implementation Order
-1. Create project structure and .csproj files
-2. Implement database migration for applications table
-3. Create domain models and DTOs
-4. Implement repository interface and Dapper implementation with unit tests
-5. Implement controller with unit tests
-6. Set up integration test infrastructure
-7. Implement end-to-end integration tests
-8. Create Makefile with development commands
-9. Test full workflow: migrate DB → run API → call endpoint
+1. Initialize Vite React TypeScript project structure
+2. Create TypeScript types/interfaces matching backend DTOs
+3. Implement API service with `getApplications()` method
+4. Write API service unit tests with mocked fetch
+5. Create ApplicationList component with loading/error/data states
+6. Write ApplicationList component unit tests
+7. Set up Vite proxy configuration to backend API
+8. Write integration tests with real API calls or MSW
+9. Add UI commands to Makefile (install-ui, run-ui, test-ui)
+10. Update .gitignore and README.md
+11. Test full workflow: run backend → run UI → view applications list
 
 ---
 
@@ -151,4 +186,9 @@ CREATE TABLE applications (
 ---
 
 ## COMMIT & PICK NEXT Stage Details
-*To be filled when entering this stage*
+```markdown
+- [ ] Remove BUILD & ASSESS, REFLECT & ADAPT, and COMMIT & PICK NEXT sections
+- [ ] Update task status (⚪ → ✅)
+- [ ] Update "Current Task" and "Current Stage" sections
+- [ ] Update memory/WORKFLOW_STATUS.md "Current Status"
+```

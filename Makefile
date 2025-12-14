@@ -36,9 +36,11 @@ install:
 	cd svc && dotnet restore
 	@echo "Installing test dependencies..."
 	cd svc.Tests && dotnet restore
-	@echo "Backend dependencies installed successfully"
+	@echo "Installing frontend dependencies..."
+	cd ui && npm install
+	@echo "All dependencies installed successfully"
 
-test: test-svc
+test: test-svc test-ui
 	@echo "All tests completed"
 
 test-svc:
@@ -70,19 +72,25 @@ coverage-svc:
 	cd svc.Tests && dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 
 run-ui:
-	@echo "UI not yet implemented"
+	@echo "Starting UI dev server on http://localhost:3000..."
+	cd ui && npm run dev
 
 test-ui:
-	@echo "UI tests not yet implemented"
+	@echo "Running frontend tests..."
+	cd ui && npm test
 
 coverage-ui:
-	@echo "UI coverage not yet implemented"
+	@echo "Running frontend tests with coverage..."
+	cd ui && npm run test:coverage
 
 ui-build:
-	@echo "UI build not yet implemented"
+	@echo "Building UI for production..."
+	cd ui && npm run build
 
 clean:
 	@echo "Cleaning generated files..."
 	cd svc && dotnet clean
 	cd svc.Tests && dotnet clean
+	@if exist ui\node_modules rmdir /s /q ui\node_modules
+	@if exist ui\dist rmdir /s /q ui\dist
 	@echo "Clean completed"
