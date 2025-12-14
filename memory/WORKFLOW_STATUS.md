@@ -94,6 +94,55 @@ A **task** represents a single behavioral scenario within a story:
 - Goes through the complete four-stage process
 - Has clear, testable completion criteria
 
+## CRITICAL: Sequential Task Rule
+
+**ABSOLUTE REQUIREMENT**: Tasks MUST be completed one at a time, in sequence. No exceptions.
+
+### The Rule
+- **ONE task at a time**: Only ONE task may be in "IN PROGRESS" status at any given time
+- **Complete before starting next**: A task MUST complete ALL FOUR STAGES (PLAN → BUILD & ASSESS → REFLECT & ADAPT → COMMIT & PICK NEXT) before the next task begins
+- **No parallel work**: Never work on Task N+1 while Task N is incomplete
+- **No "efficient" bundling**: Even if it seems efficient to implement multiple tasks together, DON'T
+
+### Why This Rule Exists
+1. **Focused Progress**: Ensures concentrated effort on one behavioral scenario at a time
+2. **Clear Commits**: Each commit maps to exactly one acceptance criterion
+3. **Reviewable Changes**: Smaller, focused commits are easier to review and understand
+4. **Traceability**: Clear lineage from requirement → task → commit → code
+5. **Scope Control**: Prevents scope creep during implementation
+6. **Quality Gates**: Forces quality validation at each task boundary
+
+### Validation Checklist (Use BEFORE starting any implementation)
+Before writing ANY code, verify:
+- [ ] Is the current task's acceptance criteria FULLY defined?
+- [ ] Is there currently ONLY ONE task with status "🔵 IN PROGRESS"?
+- [ ] Have I completed ALL previous tasks in sequence?
+- [ ] Am I implementing ONLY the current task's Given-When-Then scenario?
+
+### Common Violations to Avoid
+❌ **DON'T**: Implement empty state handling while building the main list component (Tasks 2 & 3 together)
+✅ **DO**: Build list component first, commit, THEN add empty state in separate task
+
+❌ **DON'T**: Add error handling for multiple scenarios at once
+✅ **DO**: Handle one error scenario per task, commit, move to next
+
+❌ **DON'T**: "While I'm here, I'll also add..." thinking
+✅ **DO**: Stick strictly to current task scope, note future work for later tasks
+
+### Enforcement Protocol
+**Assistant's Responsibility:**
+1. Before implementation, check work item file task statuses
+2. Verify only ONE task is marked "🔵 IN PROGRESS"
+3. If tempted to implement features beyond current task scope, STOP
+4. Complete current task through all four stages FIRST
+5. Only in Stage 4 (COMMIT & PICK NEXT) should the next task be selected
+
+**User's Responsibility:**
+- Monitor for scope creep during BUILD & ASSESS
+- Review commits to ensure they map to single tasks
+- Call out violations when spotted
+- Guide assistant back to sequential workflow if deviation occurs
+
 ### Working Document Pattern
 - Copy `changes/template.md` to create numbered story files
 - Story file becomes the active working document
