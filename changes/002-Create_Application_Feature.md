@@ -262,9 +262,39 @@ None - requirements are clear from acceptance criteria
 
 ---
 
+## Task 4: COMMIT & PICK NEXT Stage
+
+### Commit Message
+```
+feat: add form validation and submission to create application form
+
+- Implement client-side validation with name format checking (alphanumeric, underscore, hyphen only)
+- Validate name length (1-255 chars) and description length (max 1000 chars)
+- Integrate form submission with API via createApplication endpoint
+- Add loading state management (disabled fields, "Creating..." button text, aria-busy)
+- Display success message with ARIA live region (role="status", aria-live="polite")
+- Display error message with ARIA alert (role="alert", aria-live="assertive")
+- Trim whitespace from name and description before submission
+- Send empty/whitespace-only descriptions as null
+- Keep form enabled after successful submission
+
+All 45 frontend tests passing
+TypeScript validation clean
+```
+
+### Branch Status
+- Current branch: feature/create-application-feature (assumed)
+- Commit ready: Yes
+- Changes staged: Pending user execution
+
+### Next Task Selected
+**Task 5: Frontend - Integration with Application List**
+
+---
+
 ### Task 5: Frontend - Integration with Application List
 **Given** a new application has been successfully created  
 **When** the form submission completes  
 **Then** the application list refreshes to show the new application and the form is reset
 
-**Status**: ⚪ NOT STARTED
+**Status**: 🔵 IN PROGRESS - PLAN Stage
