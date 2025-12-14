@@ -1,5 +1,7 @@
 using ConfigService.Repositories;
+using ConfigService.Validation;
 using FluentMigrator.Runner;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +12,9 @@ builder.Services.AddSwaggerGen();
 
 // Register repositories
 builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
+
+// Register validators
+builder.Services.AddValidatorsFromAssemblyContaining<CreateApplicationRequestValidator>();
 
 // Configure FluentMigrator
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
