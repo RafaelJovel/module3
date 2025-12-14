@@ -106,7 +106,6 @@ export function CreateApplicationForm() {
             value={name}
             onChange={handleNameChange}
             disabled={isLoading}
-            required
             aria-describedby={errorMessage ? 'form-error' : undefined}
           />
         </div>
