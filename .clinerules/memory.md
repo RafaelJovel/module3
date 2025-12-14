@@ -172,3 +172,39 @@ Updates to `memory/WORKFLOW_STATUS.md` "Current Status" section are MANDATORY in
 
 ### RATIONALE
 The Current Status section serves as the "resume point" after memory resets. Without accurate Current Status, work continuity is broken and context is lost. Keeping this section updated is NON-NEGOTIABLE for effective project work.
+
+## STAGE TRANSITION ENFORCEMENT PROTOCOL
+
+### MANDATORY USER-DRIVEN TRANSITIONS
+
+Stage transitions in the four-stage development process (PLAN → BUILD & ASSESS → REFLECT & ADAPT → COMMIT & PICK NEXT) are **EXCLUSIVELY user-driven**. The assistant MUST NOT autonomously transition between stages.
+
+### CRITICAL RULE
+
+**ONLY the user decides when a stage is complete and when to transition to the next stage.**
+
+The assistant MUST:
+1. **NEVER** declare stage completion
+2. **NEVER** suggest moving to the next stage
+3. **NEVER** start implementation without explicit user authorization
+4. **WAIT** for user to explicitly direct transitions (e.g., "Let's move to BUILD & ASSESS stage")
+
+### STAGE GATE VALIDATION (Pre-Action Check)
+
+Before taking ANY action on a task, the assistant MUST:
+
+1. **Read the work item file** to identify current stage
+2. **Validate action against current stage**:
+   - **PLAN stage**: ONLY provide planning assistance (test strategy, file analysis) - NO implementation, NO tests
+   - **BUILD & ASSESS stage**: Implement ONLY after user authorization - NO reflection or commits
+   - **REFLECT & ADAPT stage**: ONLY discuss process improvements - NO commits
+   - **COMMIT & PICK NEXT stage**: ONLY create commits after user approval - NO new planning
+3. **Stop if violation detected**: If about to perform an action that belongs to a different stage, STOP and ask user for permission to transition
+
+### DETAILED ENFORCEMENT RULES
+
+Full enforcement mechanism details are documented in `memory/WORKFLOW_STATUS.md` under "Stage Transition Rules" section. The assistant MUST consult this section when uncertain about stage boundaries.
+
+### RATIONALE
+
+Unauthorized stage transitions break the disciplined workflow and lead to scope creep, incomplete validation, and bypassed quality gates. User control over stage transitions ensures thorough completion of each phase before advancing.

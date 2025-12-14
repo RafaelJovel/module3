@@ -72,11 +72,38 @@ Every work item follows a structured four-stage process to ensure quality, consi
 - The user will be very clear and explicit when directing stage transitions (e.g., "Let's move to BUILD & ASSESS stage")
 - Assistant should focus on completing stage work thoroughly and responding to user direction
 
+**ENFORCEMENT MECHANISM - STAGE GATE VALIDATION**:
+
+Before taking ANY action on a task, the assistant MUST perform this validation:
+
+1. **Read Current Stage**: Check the work item file to identify the current stage
+2. **Stage Gate Check**:
+   - If current stage is **PLAN**: 
+     - ONLY provide planning assistance (test strategy, file analysis, discussion)
+     - NEVER write implementation code
+     - NEVER execute tests
+     - WAIT for user to explicitly say "move to BUILD & ASSESS" or similar
+   - If current stage is **BUILD & ASSESS**: 
+     - Implement code and run tests ONLY after user authorized transition
+     - NEVER move to REFLECT & ADAPT without user approval
+   - If current stage is **REFLECT & ADAPT**: 
+     - ONLY discuss process improvements and future tasks
+     - NEVER create commits
+     - WAIT for user to say "move to COMMIT & PICK NEXT" or similar
+   - If current stage is **COMMIT & PICK NEXT**: 
+     - ONLY create commits and select next task after user approval
+     - NEVER start planning next task without user directive
+
+3. **Violation Response**: If the assistant catches itself about to violate stage boundaries:
+   - STOP immediately
+   - State: "I cannot proceed with [action] because we are currently in [stage] and this action belongs to [other stage]"
+   - Ask user: "Would you like to transition to [other stage] now?"
+
 **Stage Transition Requirements:**
-- **PLAN → BUILD & ASSESS**: User confirms test strategy and file changes are clearly defined
-- **BUILD & ASSESS → REFLECT & ADAPT**: User confirms ALL quality validation passes cleanly
-- **REFLECT & ADAPT → COMMIT & PICK NEXT**: User confirms process assessment and future task review are complete
-- **COMMIT & PICK NEXT → PLAN**: User directs beginning of next Given-When-Then task planning
+- **PLAN → BUILD & ASSESS**: User confirms test strategy and file changes are clearly defined, then **explicitly directs** transition
+- **BUILD & ASSESS → REFLECT & ADAPT**: User confirms ALL quality validation passes cleanly, then **explicitly directs** transition
+- **REFLECT & ADAPT → COMMIT & PICK NEXT**: User confirms process assessment and future task review are complete, then **explicitly directs** transition
+- **COMMIT & PICK NEXT → PLAN**: User **explicitly directs** beginning of next Given-When-Then task planning
 
 ## Work Item Structure
 
@@ -237,18 +264,40 @@ git commit -m "feat: implement [task description]
 
 ## Current Status
 
+**ENFORCEMENT MECHANISM - MANDATORY CURRENT STATUS UPDATE**:
+
+The assistant MUST update this "Current Status" section BEFORE taking any action on a task. This is NON-NEGOTIABLE.
+
+**Pre-Action Validation Checklist** (Execute at the start of EVERY interaction):
+1. Read the Current Status section below
+2. Read the active work item file (if different from what's listed)
+3. Compare the two - do they match?
+   - Does the Work Item File field match the actual active work item?
+   - Does the Current Task match the task in the work item file?
+   - Does the Current Stage match the stage in the work item file?
+   - Is the Last Updated date current?
+4. If ANY mismatch is found:
+   - **STOP all other work immediately**
+   - **Update this section FIRST** before proceeding
+   - Inform user: "Updated WORKFLOW_STATUS.md Current Status to reflect current work"
+
+**When Updates Are MANDATORY**:
+- At the start of every new task (even if continuing on the same work item)
+- When transitioning between stages (PLAN → BUILD & ASSESS, etc.)
+- When starting a new work item
+- At the beginning of EVERY interaction with the user (verify it's current)
+
+**Failure to Update = System Error**: Failing to keep this section synchronized is a HIGH PRIORITY violation that compromises work continuity after memory resets.
+
 ### Active Work Item
-- **Work Item File**: [changes/001-create application listing feature.md](../changes/001-create%20application%20listing%20feature.md)
-- **Current Task**: All tasks complete
-- **Current Stage**: Work item completed
+- **Work Item File**: [changes/002-Create_Application_Feature.md](../changes/002-Create_Application_Feature.md)
+- **Current Task**: Task 1: Backend - Create Application Endpoint
+- **Current Stage**: PLAN
 - **Last Updated**: 2025-12-14
 
 ### Recent Progress
-- ✅ All three tasks completed successfully (Backend API, Frontend List Display, Empty State Handling)
-- ✅ TypeScript configuration issue resolved (jest-dom types now properly configured)
-- ✅ All tests passing (14/14 tests: 5 API service tests + 9 component tests)
-- ✅ TypeScript type-check validation passing
-- ✅ Full quality validation complete with no errors or warnings
+- 🔵 Started Work Item 002: Create Application Feature
+- 🔵 Task 1 PLAN stage in progress: Defining test strategy and file changes for POST endpoint
 
 ### When Active
 When working on a story, this section will show:
