@@ -1,13 +1,18 @@
 import { useState } from 'react';
 import type { FormEvent, ChangeEvent } from 'react';
 import { api } from '../services/api';
+import type { ApplicationResponse } from '../types/Application';
 import styles from './CreateApplicationForm.module.css';
 
 const NAME_PATTERN = /^[a-zA-Z0-9_-]+$/;
 const MAX_NAME_LENGTH = 255;
 const MAX_DESCRIPTION_LENGTH = 1000;
 
-export function CreateApplicationForm() {
+interface CreateApplicationFormProps {
+  onSuccess?: (application: ApplicationResponse) => void;
+}
+
+export function CreateApplicationForm({ onSuccess }: CreateApplicationFormProps = {}) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -50,6 +55,12 @@ export function CreateApplicationForm() {
     return null;
   };
 
+  const resetForm = () => {
+    setName('');
+    setDescription('');
+    setErrorMessage('');
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -77,7 +88,14 @@ export function CreateApplicationForm() {
     try {
       const response = await api.createApplication(request);
       setSuccessMessage(`Application "${response.name}" created successfully!`);
-      // Note: We're not clearing the form here - that's deferred to Task 5
+      
+      // Call onSuccess callback if provided
+      if (onSuccess) {
+        onSuccess(response);
+      }
+      
+      // Reset form after successful submission
+      resetForm();
     } catch (error) {
       if (error instanceof Error) {
         setErrorMessage(error.message);

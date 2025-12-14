@@ -3,7 +3,11 @@ import { api } from '../services/api';
 import type { ApplicationResponse } from '../types/Application';
 import styles from './ApplicationList.module.css';
 
-export function ApplicationList() {
+interface ApplicationListProps {
+  refreshTrigger?: number;
+}
+
+export function ApplicationList({ refreshTrigger = 0 }: ApplicationListProps) {
   const [applications, setApplications] = useState<ApplicationResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +27,7 @@ export function ApplicationList() {
     };
 
     fetchApplications();
-  }, []);
+  }, [refreshTrigger]);
 
   if (loading) {
     return <div className={styles.loading}>Loading applications...</div>;

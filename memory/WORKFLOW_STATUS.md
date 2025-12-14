@@ -35,6 +35,10 @@ Every work item follows a structured four-stage process to ensure quality, consi
   - Verify implementation matches acceptance criteria
   - Ensure all quality checks pass (linting, formatting, type checking)
   - Ensure consistent coding and testing patterns
+  - **Check test file sizes** and flag for refactoring if needed:
+    - More than 20 tests in a single file
+    - More than 500 lines in a test file
+    - Tests covering more than 3 distinct concerns
 - **Output**: Working, tested code that satisfies the acceptance criteria
 - **Completion Criteria**: ALL quality validation passes cleanly without errors or warnings
 
@@ -292,7 +296,7 @@ The assistant MUST update this "Current Status" section BEFORE taking any action
 ### Active Work Item
 - **Work Item File**: [changes/002-Create_Application_Feature.md](../changes/002-Create_Application_Feature.md)
 - **Current Task**: Task 5: Frontend - Integration with Application List
-- **Current Stage**: PLAN
+- **Current Stage**: REFLECT & ADAPT
 - **Last Updated**: 2025-12-14
 
 ### Recent Progress

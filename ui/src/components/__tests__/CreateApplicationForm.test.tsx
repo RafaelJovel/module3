@@ -514,10 +514,235 @@ describe('CreateApplicationForm Component', () => {
         expect(screen.getByText('Application "test-app" created successfully!')).toBeInTheDocument();
       });
 
-      // Form should be enabled and retain values
+      // Form should be enabled and reset (fields cleared)
       expect(nameInput).not.toBeDisabled();
       expect(submitButton).not.toBeDisabled();
+      expect(nameInput.value).toBe('');
+    });
+  });
+
+  describe('Callback Integration', () => {
+    it('should call onSuccess callback after successful API response', async () => {
+      const user = userEvent.setup({delay: null});
+      const mockResponse: ApplicationResponse = {
+        id: '01HQXYZ123',
+        name: 'test-app',
+        description: 'Test description',
+      };
+      mockCreateApplication.mockResolvedValue(mockResponse);
+      const onSuccess = jest.fn();
+
+      render(<CreateApplicationForm onSuccess={onSuccess} />);
+
+      const nameInput = screen.getByLabelText('Application Name');
+      const submitButton = screen.getByRole('button', { name: 'Create Application' });
+
+      await user.clear(nameInput);
+      await user.type(nameInput, 'test-app');
+      await user.click(submitButton);
+
+      await waitFor(() => {
+        expect(onSuccess).toHaveBeenCalledTimes(1);
+        expect(onSuccess).toHaveBeenCalledWith(mockResponse);
+      });
+    });
+
+    it('should NOT call onSuccess callback when API fails', async () => {
+      const user = userEvent.setup({delay: null});
+      mockCreateApplication.mockRejectedValue(new Error('Network error'));
+      const onSuccess = jest.fn();
+
+      render(<CreateApplicationForm onSuccess={onSuccess} />);
+
+      const nameInput = screen.getByLabelText('Application Name');
+      const submitButton = screen.getByRole('button', { name: 'Create Application' });
+
+      await user.clear(nameInput);
+      await user.type(nameInput, 'test-app');
+      await user.click(submitButton);
+
+      await waitFor(() => {
+        expect(screen.getByText('Network error')).toBeInTheDocument();
+      });
+
+      expect(onSuccess).not.toHaveBeenCalled();
+    });
+
+    it('should work without onSuccess callback (optional prop)', async () => {
+      const user = userEvent.setup({delay: null});
+      const mockResponse: ApplicationResponse = {
+        id: '01HQXYZ123',
+        name: 'test-app',
+        description: null,
+      };
+      mockCreateApplication.mockResolvedValue(mockResponse);
+
+      render(<CreateApplicationForm />);
+
+      const nameInput = screen.getByLabelText('Application Name');
+      const submitButton = screen.getByRole('button', { name: 'Create Application' });
+
+      await user.clear(nameInput);
+      await user.type(nameInput, 'test-app');
+      await user.click(submitButton);
+
+      // Should not throw error and success message should display
+      expect(await screen.findByText('Application "test-app" created successfully!')).toBeInTheDocument();
+    });
+  });
+
+  describe('Form Reset Behavior', () => {
+    it('should reset name field after successful submission', async () => {
+      const user = userEvent.setup({delay: null});
+      const mockResponse: ApplicationResponse = {
+        id: '01HQXYZ123',
+        name: 'test-app',
+        description: null,
+      };
+      mockCreateApplication.mockResolvedValue(mockResponse);
+
+      render(<CreateApplicationForm />);
+
+      const nameInput = screen.getByLabelText('Application Name') as HTMLInputElement;
+      const submitButton = screen.getByRole('button', { name: 'Create Application' });
+
+      await user.clear(nameInput);
+      await user.type(nameInput, 'test-app');
+      await user.click(submitButton);
+
+      await waitFor(() => {
+        expect(nameInput.value).toBe('');
+      });
+    });
+
+    it('should reset description field after successful submission', async () => {
+      const user = userEvent.setup({delay: null});
+      const mockResponse: ApplicationResponse = {
+        id: '01HQXYZ123',
+        name: 'test-app',
+        description: 'Test description',
+      };
+      mockCreateApplication.mockResolvedValue(mockResponse);
+
+      render(<CreateApplicationForm />);
+
+      const nameInput = screen.getByLabelText('Application Name');
+      const descriptionTextarea = screen.getByLabelText('Description') as HTMLTextAreaElement;
+      const submitButton = screen.getByRole('button', { name: 'Create Application' });
+
+      await user.clear(nameInput);
+      await user.type(nameInput, 'test-app');
+      await user.clear(descriptionTextarea);
+      await user.type(descriptionTextarea, 'Test description');
+      await user.click(submitButton);
+
+      await waitFor(() => {
+        expect(descriptionTextarea.value).toBe('');
+      });
+    });
+
+    it('should keep success message visible after form reset', async () => {
+      const user = userEvent.setup({delay: null});
+      const mockResponse: ApplicationResponse = {
+        id: '01HQXYZ123',
+        name: 'test-app',
+        description: null,
+      };
+      mockCreateApplication.mockResolvedValue(mockResponse);
+
+      render(<CreateApplicationForm />);
+
+      const nameInput = screen.getByLabelText('Application Name') as HTMLInputElement;
+      const submitButton = screen.getByRole('button', { name: 'Create Application' });
+
+      await user.clear(nameInput);
+      await user.type(nameInput, 'test-app');
+      await user.click(submitButton);
+
+      await waitFor(() => {
+        expect(nameInput.value).toBe('');
+      });
+
+      // Success message should still be visible
+      expect(screen.getByText('Application "test-app" created successfully!')).toBeInTheDocument();
+    });
+
+    it('should NOT reset form fields after API failure', async () => {
+      const user = userEvent.setup({delay: null});
+      mockCreateApplication.mockRejectedValue(new Error('Network error'));
+
+      render(<CreateApplicationForm />);
+
+      const nameInput = screen.getByLabelText('Application Name') as HTMLInputElement;
+      const descriptionTextarea = screen.getByLabelText('Description') as HTMLTextAreaElement;
+      const submitButton = screen.getByRole('button', { name: 'Create Application' });
+
+      await user.clear(nameInput);
+      await user.type(nameInput, 'test-app');
+      await user.clear(descriptionTextarea);
+      await user.type(descriptionTextarea, 'Test description');
+      await user.click(submitButton);
+
+      await waitFor(() => {
+        expect(screen.getByText('Network error')).toBeInTheDocument();
+      });
+
+      // Form should retain values after error
       expect(nameInput.value).toBe('test-app');
+      expect(descriptionTextarea.value).toBe('Test description');
+    });
+
+    it('should allow creating multiple applications in sequence', async () => {
+      const user = userEvent.setup({delay: null});
+      const mockResponse1: ApplicationResponse = {
+        id: '01HQXYZ123',
+        name: 'test-app-1',
+        description: null,
+      };
+      const mockResponse2: ApplicationResponse = {
+        id: '01HQXYZ124',
+        name: 'test-app-2',
+        description: null,
+      };
+
+      mockCreateApplication
+        .mockResolvedValueOnce(mockResponse1)
+        .mockResolvedValueOnce(mockResponse2);
+
+      render(<CreateApplicationForm />);
+
+      const nameInput = screen.getByLabelText('Application Name');
+      const submitButton = screen.getByRole('button', { name: 'Create Application' });
+
+      // Create first application
+      await user.clear(nameInput);
+      await user.type(nameInput, 'test-app-1');
+      await user.click(submitButton);
+
+      await waitFor(() => {
+        expect(mockCreateApplication).toHaveBeenCalledWith({
+          name: 'test-app-1',
+          description: null,
+        });
+      });
+
+      // Form should be reset and ready for next entry
+      await waitFor(() => {
+        expect((nameInput as HTMLInputElement).value).toBe('');
+      });
+
+      // Create second application
+      await user.type(nameInput, 'test-app-2');
+      await user.click(submitButton);
+
+      await waitFor(() => {
+        expect(mockCreateApplication).toHaveBeenCalledWith({
+          name: 'test-app-2',
+          description: null,
+        });
+      });
+
+      expect(mockCreateApplication).toHaveBeenCalledTimes(2);
     });
   });
 
