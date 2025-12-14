@@ -298,3 +298,123 @@ TypeScript validation clean
 **Then** the application list refreshes to show the new application and the form is reset
 
 **Status**: 🔵 IN PROGRESS - PLAN Stage
+
+---
+
+## Task 5: PLAN Stage
+
+### Test Strategy
+
+#### Unit Tests (ui/src/components/__tests__/CreateApplicationForm.test.tsx)
+
+**Callback Integration Tests:**
+1. Test that CreateApplicationForm accepts an `onSuccess` callback prop
+2. Test that `onSuccess` callback is called after successful API response
+3. Test that `onSuccess` is called with the created application data
+4. Test that `onSuccess` is NOT called when API fails
+5. Test that form fields are reset after successful submission (when callback provided)
+6. Test that success/error messages are cleared after form reset
+
+**Form Reset Behavior Tests:**
+7. Test that form reset clears the name field
+8. Test that form reset clears the description field
+9. Test that form reset clears success messages
+10. Test that form reset clears error messages
+11. Test that form reset enables the submit button
+
+#### Integration Tests (ui/src/App.tsx or new test file)
+
+**Full Integration Flow:**
+12. Test that App.tsx handles application creation success
+13. Test that ApplicationList receives updated data after creation
+14. Test that newly created application appears in the list
+15. Test that form is cleared after successful creation
+
+#### Component Tests (ui/src/App.tsx tests if they exist)
+16. Test that App.tsx passes `onSuccess` callback to CreateApplicationForm
+17. Test that callback triggers list refresh (re-fetch applications)
+
+### File Changes
+
+#### Files to Modify
+
+1. **ui/src/components/CreateApplicationForm.tsx**
+   - Add `onSuccess?: (application: ApplicationResponse) => void` prop to component interface
+   - Call `onSuccess(response)` after successful API response (in the try block after setSuccessMessage)
+   - Add form reset function that clears:
+     - name field (setName(''))
+     - description field (setDescription(''))
+     - success message (setSuccessMessage(''))
+     - error message (setErrorMessage(''))
+   - Call form reset function after successful submission and onSuccess callback
+   - Update component to be more flexible (optional callback for standalone use)
+
+2. **ui/src/App.tsx**
+   - Read current implementation to understand structure
+   - Add `handleApplicationCreated` callback function that:
+     - Triggers ApplicationList to refresh (re-fetch applications)
+     - Method depends on current App.tsx structure (state management, props)
+   - Pass `onSuccess={handleApplicationCreated}` prop to CreateApplicationForm
+   - Ensure ApplicationList can be refreshed (may need to add refresh logic or state lifting)
+
+3. **ui/src/components/__tests__/CreateApplicationForm.test.tsx**
+   - Add all tests from test strategy above
+   - Mock the `onSuccess` callback using jest.fn()
+   - Test that callback is called with correct application data
+   - Test form reset behavior
+   - Test that callback is NOT called on errors
+
+4. **ui/src/components/ApplicationList.tsx** (if needed)
+   - May need to add refresh mechanism if not already present
+   - Depends on current implementation (props vs state management)
+   - Read file first to determine if changes are needed
+
+#### Files to Read First (Analysis)
+- **ui/src/App.tsx**: Understand current structure and how ApplicationList is managed
+- **ui/src/components/ApplicationList.tsx**: Check if refresh mechanism exists
+
+#### Files NOT to Change (Task Scope Control)
+- **ui/src/services/api.ts**: No API changes needed
+- **ui/src/types/Application.ts**: May add callback type if needed, but likely not necessary
+
+### Implementation Notes
+
+**Component Communication Pattern:**
+- Use callback prop pattern (onSuccess) for upward communication
+- Parent (App.tsx) controls data flow and list refresh
+- Child (CreateApplicationForm) notifies parent of success via callback
+
+**Form Reset Strategy:**
+- Reset form fields only after successful submission
+- Clear all messages (success and error)
+- Keep form enabled for next submission
+- Reset happens after onSuccess callback is fired
+
+**List Refresh Strategy:**
+- Re-fetch applications from API after creation
+- ApplicationList should automatically re-render with new data
+- No manual DOM manipulation - rely on React state updates
+
+**User Experience Flow:**
+1. User fills form and clicks "Create Application"
+2. Form shows loading state
+3. API call succeeds
+4. Success message displays briefly
+5. Form fields are cleared
+6. ApplicationList refreshes and shows new application
+7. User can immediately create another application
+
+**Edge Cases to Consider:**
+- What if onSuccess callback is not provided? (Form should still work, just no list refresh)
+- What if list refresh fails? (Application is created but list doesn't update - acceptable for this task)
+- Should success message display before or after form reset? (After - so user sees confirmation)
+
+### Dependencies
+- No new external dependencies required
+- All functionality uses existing React patterns and libraries
+
+### Questions/Decisions Needed
+1. **App.tsx Structure**: Need to read App.tsx to understand current component structure
+2. **ApplicationList Refresh**: Need to verify if ApplicationList can be refreshed or if state lifting is required
+3. **Success Message Timing**: Should success message remain visible after form reset, or clear immediately?
+   - **Decision**: Clear immediately during form reset for clean UX
