@@ -33,6 +33,18 @@ export function ApplicationList() {
     return <div className={styles.error}>Error: {error}</div>;
   }
 
+  if (applications.length === 0) {
+    return (
+      <div className={styles.container}>
+        <h2>Applications</h2>
+        <div className={styles.empty}>
+          <p>No applications found.</p>
+          <p>Create your first application to get started.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       <h2>Applications</h2>

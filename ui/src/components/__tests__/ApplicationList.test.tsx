@@ -147,4 +147,34 @@ describe('ApplicationList Component', () => {
     const listItem = screen.getByText('my-app').closest('li');
     expect(listItem?.querySelector('p')).not.toBeInTheDocument();
   });
+
+  it('should show empty state when no applications exist', async () => {
+    const mockApplications: ApplicationResponse[] = [];
+
+    mockApi.getApplications.mockResolvedValueOnce(mockApplications);
+
+    render(<ApplicationList />);
+
+    await waitFor(() => {
+      expect(screen.queryByText('Loading applications...')).not.toBeInTheDocument();
+    });
+
+    expect(screen.getByText('No applications found.')).toBeInTheDocument();
+    expect(screen.getByText('Create your first application to get started.')).toBeInTheDocument();
+  });
+
+  it('should show empty state message without application list', async () => {
+    const mockApplications: ApplicationResponse[] = [];
+
+    mockApi.getApplications.mockResolvedValueOnce(mockApplications);
+
+    render(<ApplicationList />);
+
+    await waitFor(() => {
+      expect(screen.getByText('No applications found.')).toBeInTheDocument();
+    });
+
+    // Should not render the list when empty
+    expect(screen.queryByRole('list')).not.toBeInTheDocument();
+  });
 });
