@@ -1,0 +1,36 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+.vs/
+.vscode/
+*.dll
+*.exe
+*.pdb
+
+# Development config files
+svc/appsettings.Development.json
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+dist/
+
+# Test coverage
+coverage/
+*.coverage
+*.coveragexml
+TestResults/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
