@@ -1,3 +1,4 @@
+import { CreateApplicationForm } from './components/CreateApplicationForm';
 import { ApplicationList } from './components/ApplicationList';
 import './App.css';
 
@@ -8,6 +9,7 @@ function App() {
         <h1>Configuration Service</h1>
       </header>
       <main>
+        <CreateApplicationForm />
         <ApplicationList />
       </main>
     </div>

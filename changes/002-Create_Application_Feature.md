@@ -30,7 +30,7 @@ Implement the API and UI to be able to create applications that are to have conf
 **When** the administrator interacts with the UI  
 **Then** they see a form with fields for application name and description, with a submit button
 
-**Status**: ⚪ NOT STARTED
+**Status**: 🔵 IN PROGRESS
 
 ### Task 4: Frontend - Form Validation and Submission
 **Given** the create application form is displayed  
@@ -48,9 +48,9 @@ Implement the API and UI to be able to create applications that are to have conf
 
 ---
 
-## Current Task: Task 1 - Backend Create Application Endpoint
+## Current Task: Task 3 - Frontend Create Application Form Component
 
-### Current Stage: 🔵 PLAN
+### Current Stage: 🔵 BUILD & ASSESS
 
 ---
 
@@ -58,68 +58,76 @@ Implement the API and UI to be able to create applications that are to have conf
 
 ### Test Strategy
 
-#### Unit Tests (Backend - with mocked database)
-1. **ApplicationRepository Tests** (`svc.Tests/Repositories/ApplicationRepositoryTests.cs`)
-   - `CreateApplication_WithValidData_ReturnsCreatedApplication`
-   - `CreateApplication_WithDuplicateName_ThrowsException`
-   - `CreateApplication_GeneratesULID_ForNewApplication`
-   - `CreateApplication_SetsCreatedAtTimestamp`
-   - `CreateApplication_CreatesDefaultConfiguration`
-
-2. **ApplicationsController Tests** (`svc.Tests/Controllers/ApplicationsControllerTests.cs`)
-   - `CreateApplication_WithValidData_Returns201Created`
-   - `CreateApplication_WithValidData_ReturnsCreatedApplication`
-   - `CreateApplication_WithInvalidName_Returns422UnprocessableEntity`
-   - `CreateApplication_WithDuplicateName_Returns409Conflict`
-   - `CreateApplication_WithMissingName_Returns422UnprocessableEntity`
-   - `CreateApplication_IncludesLocationHeader_WithNewResourceUrl`
-
-3. **Validation Tests** (`svc.Tests/Validation/CreateApplicationRequestValidatorTests.cs`)
-   - `Validator_WithValidName_PassesValidation`
-   - `Validator_WithEmptyName_FailsValidation`
-   - `Validator_WithInvalidCharacters_FailsValidation`
-   - `Validator_WithNameTooLong_FailsValidation`
-   - `Validator_WithDescriptionTooLong_FailsValidation`
-   - `Validator_WithNullDescription_PassesValidation`
-
-#### Integration Tests (Backend - with real database)
-1. **Applications Endpoint Integration Tests** (`svc.Tests/Integration/ApplicationsEndpointTests.cs`)
-   - `CreateApplication_EndToEnd_CreatesInDatabase`
-   - `CreateApplication_WithDuplicateName_Returns409Conflict`
-   - `CreateApplication_CreatesDefaultConfiguration`
-   - `CreateApplication_ThenGetById_ReturnsCreatedApplication`
+#### Unit Tests (Frontend - with mocked API)
+1. **CreateApplicationForm Component Tests** (`ui/src/components/__tests__/CreateApplicationForm.test.tsx`)
+   - `Renders_FormWithNameField`
+   - `Renders_FormWithDescriptionField`
+   - `Renders_SubmitButton`
+   - `NameField_HasCorrectLabel`
+   - `DescriptionField_HasCorrectLabel`
+   - `SubmitButton_HasCorrectText`
+   - `Form_HasAccessibleLabels` (accessibility)
 
 ### File Changes Needed
 
-#### Backend Core Files
-- `svc/Models/Requests/CreateApplicationRequest.cs` - DTO for create request
-- `svc/Validation/CreateApplicationRequestValidator.cs` - FluentValidation validator
-- `svc/Controllers/ApplicationsController.cs` - Add POST endpoint method
-- `svc/Repositories/IApplicationRepository.cs` - Add CreateAsync method signature
-- `svc/Repositories/ApplicationRepository.cs` - Implement CreateAsync method
+#### Frontend Core Files
+- `ui/src/components/CreateApplicationForm.tsx` - New form component
+- `ui/src/components/CreateApplicationForm.module.css` - Component styles
+- `ui/src/App.tsx` - Import and render the form component
 
-#### Backend Test Files
-- `svc.Tests/Controllers/ApplicationsControllerTests.cs` - Add create endpoint tests
-- `svc.Tests/Repositories/ApplicationRepositoryTests.cs` - Add repository create tests (NEW FILE)
-- `svc.Tests/Validation/CreateApplicationRequestValidatorTests.cs` - Validator tests (NEW FILE)
-- `svc.Tests/Integration/ApplicationsEndpointTests.cs` - Add integration tests for create
+#### Frontend Test Files
+- `ui/src/components/__tests__/CreateApplicationForm.test.tsx` - Component tests (NEW FILE)
 
 ### Implementation Order
-1. Create CreateApplicationRequest DTO with validation attributes
-2. Create FluentValidation validator for CreateApplicationRequest
-3. Add CreateAsync method to IApplicationRepository interface
-4. Implement CreateAsync in ApplicationRepository with database insert
-5. Add POST endpoint to ApplicationsController
-6. Write unit tests for validator
-7. Write unit tests for repository (mocked database)
-8. Write unit tests for controller (mocked repository)
-9. Write integration tests with real database
-10. Run all quality validation checks
+1. Create CreateApplicationForm.tsx with basic form structure (name input, description textarea, submit button)
+2. Create CreateApplicationForm.module.css with form styling
+3. Update App.tsx to include the form component
+4. Write unit tests for component rendering
+5. Run quality validation (npm test, type-check)
+
+**Note**: This task focuses ONLY on rendering the form UI. Form submission logic, validation, and API integration will be handled in Task 4.
 
 ---
 
 ## BUILD & ASSESS Stage Details
-*To be filled when entering this stage*
+
+### Implementation Summary
+
+#### Files Created
+1. **ui/src/components/CreateApplicationForm.tsx** - Form component with:
+   - Application Name input field (text input, required)
+   - Description textarea field (optional)
+   - Submit button
+   - Semantic HTML with proper accessibility (id/label associations)
+
+2. **ui/src/components/CreateApplicationForm.module.css** - Component styling with:
+   - Clean, modern form design matching ApplicationList styling
+   - Proper form field spacing and layout
+   - Focus states with visual feedback
+   - Responsive button styling with hover/active states
+   - Disabled state styling for future use
+
+3. **ui/src/components/__tests__/CreateApplicationForm.test.tsx** - Unit tests covering:
+   - Form renders with name field
+   - Form renders with description field
+   - Form renders with submit button
+   - Correct labels for both fields
+   - Submit button has correct text
+   - Accessible label associations (via htmlFor/id)
+
+#### Files Modified
+1. **ui/src/App.tsx** - Added CreateApplicationForm component above ApplicationList
+
+### Quality Validation Results
+✅ **Frontend Tests**: All 21 tests passed (7 new tests for CreateApplicationForm)
+✅ **TypeScript**: Type checking passed with no errors
+✅ **Implementation**: Matches acceptance criteria - form displays with name field, description field, and submit button
+
+### Notes
+- This implementation focuses ONLY on rendering the form UI elements
+- No form submission logic, validation, or API integration included (deferred to Task 4)
+- Form follows existing component patterns from ApplicationList
+- Accessible design with proper label associations for screen readers
 
 ---
 
